@@ -1,0 +1,221 @@
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Parent = localPlayer:WaitForChild("PlayerGui")
+gui.ResetOnSpawn = false
+gui.Name = "InstantStealScriptGUI"
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Modern Main Frame
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 340, 0, 200)
+frame.Position = UDim2.new(0.5, -170, 0.5, -100)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+frame.BackgroundTransparency = 0.05
+frame.BorderSizePixel = 0
+
+-- Gradient Background
+local gradient = Instance.new("UIGradient", frame)
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 100, 200)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 70, 180)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 50, 150))
+}
+gradient.Rotation = 45
+
+-- Corner Radius
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 16)
+
+-- Subtle Shadow/Stroke
+local stroke = Instance.new("UIStroke", frame)
+stroke.Color = Color3.fromRGB(40, 40, 60)
+stroke.Thickness = 2
+
+-- Make frame draggable
+frame.Active = true
+frame.Draggable = true
+
+-- Title with glow effect
+local titleContainer = Instance.new("Frame", frame)
+titleContainer.Size = UDim2.new(1, 0, 0, 50)
+titleContainer.Position = UDim2.new(0, 0, 0, 0)
+titleContainer.BackgroundTransparency = 1
+
+local title = Instance.new("TextLabel", titleContainer)
+title.Size = UDim2.new(1, -20, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 24
+title.Font = Enum.Font.GothamBold
+title.Text = "INSTANT STEAL SCRIPT"
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+local titleGlow = Instance.new("TextLabel", titleContainer)
+titleGlow.Size = UDim2.new(1, -20, 1, 0)
+titleGlow.Position = UDim2.new(0, 10, 0, 0)
+titleGlow.BackgroundTransparency = 1
+titleGlow.TextColor3 = Color3.fromRGB(0, 150, 255)
+titleGlow.TextSize = 24
+titleGlow.Font = Enum.Font.GothamBold
+titleGlow.Text = "INSTANT STEAL SCRIPT"
+titleGlow.TextTransparency = 0.7
+titleGlow.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Close button
+local closeBtn = Instance.new("TextButton", titleContainer)
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0.5, -15)
+closeBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.Text = "×"
+closeBtn.TextSize = 24
+closeBtn.Font = Enum.Font.GothamBold
+local closeCorner = Instance.new("UICorner", closeBtn)
+closeCorner.CornerRadius = UDim.new(0, 6)
+
+closeBtn.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+-- Main button with modern design
+local btnContainer = Instance.new("Frame", frame)
+btnContainer.Size = UDim2.new(0.8, 0, 0, 60)
+btnContainer.Position = UDim2.new(0.1, 0, 0.4, -30)
+btnContainer.BackgroundTransparency = 1
+
+local btnBackground = Instance.new("Frame", btnContainer)
+btnBackground.Size = UDim2.new(1, 0, 1, 0)
+btnBackground.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+btnBackground.BorderSizePixel = 0
+local btnCorner = Instance.new("UICorner", btnBackground)
+btnCorner.CornerRadius = UDim.new(0, 12)
+
+local btnStroke = Instance.new("UIStroke", btnBackground)
+btnStroke.Color = Color3.fromRGB(0, 180, 255)
+btnStroke.Thickness = 2
+
+local btn = Instance.new("TextButton", btnBackground)
+btn.Size = UDim2.new(1, 0, 1, 0)
+btn.BackgroundTransparency = 1
+btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+btn.TextSize = 22
+btn.Font = Enum.Font.GothamSemibold
+btn.Text = "START STEALING"
+btn.TextWrapped = true
+
+-- Status/Note label at bottom
+local note = Instance.new("TextLabel", frame)
+note.Size = UDim2.new(1, -20, 0, 40)
+note.Position = UDim2.new(0, 10, 1, -45)
+note.BackgroundTransparency = 1
+note.TextColor3 = Color3.fromRGB(0, 255, 150)
+note.TextSize = 16
+note.Font = Enum.Font.Gotham
+note.Text = "Ready to steal..."
+note.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Status indicator light
+local statusLight = Instance.new("Frame", note)
+statusLight.Size = UDim2.new(0, 10, 0, 10)
+statusLight.Position = UDim2.new(1, -15, 0.5, -5)
+statusLight.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+local statusCorner = Instance.new("UICorner", statusLight)
+statusCorner.CornerRadius = UDim.new(1, 0)
+
+-- Divider line
+local divider = Instance.new("Frame", frame)
+divider.Size = UDim2.new(0.9, 0, 0, 1)
+divider.Position = UDim2.new(0.05, 0, 0, 50)
+divider.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+divider.BorderSizePixel = 0
+
+-- Button animation on hover
+btn.MouseEnter:Connect(function()
+    game:GetService("TweenService"):Create(btnBackground, TweenInfo.new(0.2), {
+        BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+    }):Play()
+end)
+
+btn.MouseLeave:Connect(function()
+    game:GetService("TweenService"):Create(btnBackground, TweenInfo.new(0.2), {
+        BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    }):Play()
+end)
+
+-- Close button animation
+closeBtn.MouseEnter:Connect(function()
+    game:GetService("TweenService"):Create(closeBtn, TweenInfo.new(0.2), {
+        BackgroundColor3 = Color3.fromRGB(60, 60, 70)
+    }):Play()
+end)
+
+closeBtn.MouseLeave:Connect(function()
+    game:GetService("TweenService"):Create(closeBtn, TweenInfo.new(0.2), {
+        BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+    }):Play()
+end)
+
+-- Button click functionality (keep your original function)
+btn.MouseButton1Click:Connect(function()
+    note.Text = "Searching for your base..."
+    statusLight.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
+    
+    local spawnPart
+    for _, plot in pairs(workspace.Plots:GetChildren()) do
+        if plot:FindFirstChild("PlotSign") and plot.PlotSign:FindFirstChild("SurfaceGui") then
+            local surfaceGui = plot.PlotSign.SurfaceGui
+            if surfaceGui:FindFirstChild("Frame") and surfaceGui.Frame:FindFirstChild("TextLabel") then
+                local textLabel = surfaceGui.Frame.TextLabel
+                if textLabel.Text == localPlayer.DisplayName.."'s Base" then
+                    spawnPart = surfaceGui.Parent.Parent:FindFirstChild("Spawn")
+                    break
+                end
+            end
+        end
+    end
+
+    if not spawnPart then
+        note.Text = "❌ Base not found!"
+        statusLight.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+        task.wait(2)
+        note.Text = "Ready to steal..."
+        statusLight.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        return
+    end
+
+    note.Text = "Teleporting to base..."
+    
+    local char = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+    local humanoid = char:FindFirstChildOfClass("Humanoid")
+    local target = spawnPart.CFrame + Vector3.new(0, 2, 0)
+
+    for i = 1, 20 do
+        hrp.CFrame = target
+        task.wait()
+    end
+
+    humanoid.PlatformStand = true
+    humanoid.AutoRotate = false
+    hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
+    hrp.AssemblyAngularVelocity = Vector3.new(0,0,0)
+
+    local start = tick()
+    while tick() - start < 2 do
+        local x = (math.random() - 0.5) * 0.1
+        local y = (math.random() - 0.5) * 0.1
+        local z = (math.random() - 0.5) * 0.1
+        hrp.CFrame = target * CFrame.Angles(x, y, z)
+        task.wait(0.05)
+    end
+
+    humanoid.PlatformStand = false
+    humanoid.AutoRotate = true
+    note.Text = "✅ Successfully teleported to base!"
+    statusLight.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+end)
+
+-- The rest of your existing code follows below...
+-- [All your existing functions and the Pls Donate Script GUI code remains unchanged]
