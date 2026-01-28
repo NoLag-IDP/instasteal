@@ -1,0 +1,351 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local localPlayer = Players.LocalPlayer
+local PlayerGui = localPlayer:WaitForChild("PlayerGui")
+
+-- Noclip function
+local noclipEnabled = false
+local noclipConnection = nil
+
+local function setNoclip(enabled)
+    noclipEnabled = enabled
+    
+    if enabled then
+        if noclipConnection then noclipConnection:Disconnect() end
+        noclipConnection = RunService.Stepped:Connect(function()
+            local char = localPlayer.Character
+            if char then
+                for _, part in ipairs(char:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if noclipConnection then
+            noclipConnection:Disconnect()
+            noclipConnection = nil
+        end
+    end
+end
+
+-- Create the GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "InstantStealScriptGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+-- MAIN FRAME
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 250, 0, 165)
+MainFrame.Position = UDim2.new(0.5, -125, 0.5, -82)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = true
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainFrame
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Thickness = 2
+MainStroke.Color = Color3.fromRGB(60, 60, 70)
+MainStroke.Parent = MainFrame
+
+-- TITLE BAR
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 36)
+TitleBar.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+TitleBar.BorderSizePixel = 0
+TitleBar.Active = true
+TitleBar.Parent = MainFrame
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 10)
+TitleCorner.Parent = TitleBar
+
+local Title = Instance.new("TextLabel")
+Title.Text = "INSTANT STEAL"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 15
+Title.TextColor3 = Color3.fromRGB(220, 220, 230)
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1, -50, 1, 0)
+Title.Position = UDim2.new(0, 12, 0, 0)
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TitleBar
+
+-- CLOSE BUTTON
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 26, 0, 26)
+CloseButton.Position = UDim2.new(1, -30, 0.5, -13)
+CloseButton.Text = "×"
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 18
+CloseButton.TextColor3 = Color3.fromRGB(220, 220, 230)
+CloseButton.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+CloseButton.BorderSizePixel = 0
+CloseButton.Parent = TitleBar
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseButton
+
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- CONTENT
+local Content = Instance.new("Frame")
+Content.BackgroundTransparency = 1
+Content.Size = UDim2.new(1, -24, 1, -65)
+Content.Position = UDim2.new(0, 12, 0, 42)
+Content.Parent = MainFrame
+
+-- Button list layout
+local ButtonList = Instance.new("UIListLayout")
+ButtonList.Padding = UDim.new(0, 8)
+ButtonList.FillDirection = Enum.FillDirection.Vertical
+ButtonList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+ButtonList.VerticalAlignment = Enum.VerticalAlignment.Top
+ButtonList.SortOrder = Enum.SortOrder.LayoutOrder
+ButtonList.Parent = Content
+
+-- INSTANT STEAL BUTTON (GREEN)
+local StealBtnFrame = Instance.new("Frame")
+StealBtnFrame.Size = UDim2.new(1, 0, 0, 40)
+StealBtnFrame.LayoutOrder = 1
+StealBtnFrame.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+StealBtnFrame.BorderSizePixel = 0
+StealBtnFrame.Parent = Content
+
+local StealBtnCorner = Instance.new("UICorner")
+StealBtnCorner.CornerRadius = UDim.new(0, 8)
+StealBtnCorner.Parent = StealBtnFrame
+
+local StealBtn = Instance.new("TextButton")
+StealBtn.Size = UDim2.new(1, 0, 1, 0)
+StealBtn.BackgroundTransparency = 1
+StealBtn.Text = "TELEPORT TO BASE"
+StealBtn.Font = Enum.Font.GothamBold
+StealBtn.TextSize = 14
+StealBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+StealBtn.TextStrokeColor3 = Color3.new(0, 0, 0)
+StealBtn.TextStrokeTransparency = 0.5
+StealBtn.Parent = StealBtnFrame
+
+-- NOCLIP BUTTON (PURPLE)
+local NoclipBtnFrame = Instance.new("Frame")
+NoclipBtnFrame.Size = UDim2.new(1, 0, 0, 40)
+NoclipBtnFrame.LayoutOrder = 2
+NoclipBtnFrame.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
+NoclipBtnFrame.BorderSizePixel = 0
+NoclipBtnFrame.Parent = Content
+
+local NoclipBtnCorner = Instance.new("UICorner")
+NoclipBtnCorner.CornerRadius = UDim.new(0, 8)
+NoclipBtnCorner.Parent = NoclipBtnFrame
+
+local NoclipBtn = Instance.new("TextButton")
+NoclipBtn.Size = UDim2.new(1, 0, 1, 0)
+NoclipBtn.BackgroundTransparency = 1
+NoclipBtn.Text = "NOCLIP: OFF"
+NoclipBtn.Font = Enum.Font.GothamBold
+NoclipBtn.TextSize = 14
+NoclipBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+NoclipBtn.TextStrokeColor3 = Color3.new(0, 0, 0)
+NoclipBtn.TextStrokeTransparency = 0.5
+NoclipBtn.Parent = NoclipBtnFrame
+
+-- STATUS LABEL
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, -16, 0, 20)
+StatusLabel.Position = UDim2.new(0, 8, 1, -25)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "Ready..."
+StatusLabel.Font = Enum.Font.GothamBold
+StatusLabel.TextSize = 10
+StatusLabel.TextColor3 = Color3.fromRGB(170, 170, 180)
+StatusLabel.TextWrapped = true
+StatusLabel.TextYAlignment = Enum.TextYAlignment.Center
+StatusLabel.Parent = MainFrame
+
+-- CIRCLE TOGGLE BUTTON (Plain light black circle)
+local CircleToggle = Instance.new("TextButton")
+CircleToggle.Size = UDim2.new(0, 40, 0, 40)
+CircleToggle.Position = UDim2.new(0, 20, 0, 20)
+CircleToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 70)  -- Light black
+CircleToggle.BorderSizePixel = 0
+CircleToggle.Text = ""
+CircleToggle.ZIndex = 100  -- Make sure it's on top
+CircleToggle.Visible = true
+CircleToggle.Parent = ScreenGui
+
+local CircleCorner = Instance.new("UICorner")
+CircleCorner.CornerRadius = UDim.new(1, 0)  -- Makes it a perfect circle
+CircleCorner.Parent = CircleToggle
+
+local CircleStroke = Instance.new("UIStroke")
+CircleStroke.Thickness = 2
+CircleStroke.Color = Color3.fromRGB(100, 100, 110)
+CircleStroke.Parent = CircleToggle
+
+-- Drag variables for circle
+local circleDragging = false
+local circleDragInput, circleDragStart, circleStartPos
+
+-- Toggle GUI visibility
+CircleToggle.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- Make circle draggable
+CircleToggle.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        circleDragging = true
+        circleDragStart = input.Position
+        circleStartPos = CircleToggle.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                circleDragging = false
+            end
+        end)
+    end
+end)
+
+CircleToggle.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        circleDragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if circleDragging and input == circleDragInput then
+        local delta = input.Position - circleDragStart
+        CircleToggle.Position = UDim2.new(
+            circleStartPos.X.Scale,
+            circleStartPos.X.Offset + delta.X,
+            circleStartPos.Y.Scale,
+            circleStartPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+-- Make main GUI draggable
+local dragging, dragInput, dragStart, startPos
+local function update(input)
+    local delta = input.Position - dragStart
+    MainFrame.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
+end
+
+TitleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+TitleBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        update(input)
+    end
+end)
+
+-- INSTANT STEAL FUNCTION
+StealBtn.MouseButton1Click:Connect(function()
+    StatusLabel.Text = "Searching for base..."
+    
+    local spawnPart
+    for _, plot in pairs(workspace.Plots:GetChildren()) do
+        if plot:FindFirstChild("PlotSign") and plot.PlotSign:FindFirstChild("SurfaceGui") then
+            local surfaceGui = plot.PlotSign.SurfaceGui
+            if surfaceGui:FindFirstChild("Frame") and surfaceGui.Frame:FindFirstChild("TextLabel") then
+                local textLabel = surfaceGui.Frame.TextLabel
+                if textLabel.Text == localPlayer.DisplayName.."'s Base" then
+                    spawnPart = surfaceGui.Parent.Parent:FindFirstChild("Spawn")
+                    break
+                end
+            end
+        end
+    end
+
+    if not spawnPart then
+        StatusLabel.Text = "❌ No base!"
+        task.wait(1.5)
+        StatusLabel.Text = "Ready..."
+        return
+    end
+
+    StatusLabel.Text = "Teleporting..."
+    
+    local char = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+    local humanoid = char:FindFirstChildOfClass("Humanoid")
+    local target = spawnPart.CFrame + Vector3.new(0, 2, 0)
+
+    for i = 1, 15 do
+        hrp.CFrame = target
+        task.wait()
+    end
+
+    humanoid.PlatformStand = true
+    humanoid.AutoRotate = false
+
+    local start = tick()
+    while tick() - start < 1.5 do
+        hrp.CFrame = target * CFrame.Angles(
+            (math.random() - 0.5) * 0.1,
+            (math.random() - 0.5) * 0.1,
+            (math.random() - 0.5) * 0.1
+        )
+        task.wait(0.05)
+    end
+
+    humanoid.PlatformStand = false
+    humanoid.AutoRotate = true
+    StatusLabel.Text = "✅ Done!"
+end)
+
+-- NOCLIP FUNCTION
+NoclipBtn.MouseButton1Click:Connect(function()
+    setNoclip(not noclipEnabled)
+    
+    if noclipEnabled then
+        NoclipBtnFrame.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
+        NoclipBtn.Text = "NOCLIP: ON"
+        StatusLabel.Text = "Noclip ON"
+    else
+        NoclipBtnFrame.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
+        NoclipBtn.Text = "NOCLIP: OFF"
+        StatusLabel.Text = "Noclip OFF"
+    end
+end)
+
+-- Cleanup
+ScreenGui.Destroying:Connect(function()
+    setNoclip(false)
+end)
+
+print("Instant Steal GUI Loaded ✅")
