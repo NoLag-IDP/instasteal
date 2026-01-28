@@ -1,0 +1,180 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+local PlayerGui = localPlayer:WaitForChild("PlayerGui")
+
+-- Noclip function
+local noclipEnabled = false
+local noclipConnection = nil
+
+local function setNoclip(enabled)
+    noclipEnabled = enabled
+    
+    if enabled then
+        if noclipConnection then noclipConnection:Disconnect() end
+        noclipConnection = RunService.Stepped:Connect(function()
+            local char = localPlayer.Character
+            if char then
+                for _, part in ipairs(char:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if noclipConnection then
+            noclipConnection:Disconnect()
+            noclipConnection = nil
+        end
+    end
+end
+
+-- GUI
+local gui = Instance.new("ScreenGui")
+gui.Parent = PlayerGui
+gui.ResetOnSpawn = false
+gui.Name = "InstantStealGUI"
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 200, 0, 100)
+frame.Position = UDim2.new(0.5, -100, 0.5, -50)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+frame.BorderSizePixel = 0
+
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 10)
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 18
+title.Font = Enum.Font.GothamBold
+title.Text = "Instant Steal"
+
+-- BUTTONS AT BOTTOM
+local buttonContainer = Instance.new("Frame", frame)
+buttonContainer.Size = UDim2.new(1, -20, 0, 50)
+buttonContainer.Position = UDim2.new(0, 10, 1, -60)
+buttonContainer.BackgroundTransparency = 1
+
+local buttonList = Instance.new("UIListLayout", buttonContainer)
+buttonList.FillDirection = Enum.FillDirection.Horizontal
+buttonList.Padding = UDim.new(0, 10)
+buttonList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- Teleport Button
+local teleportBtn = Instance.new("TextButton", buttonContainer)
+teleportBtn.Size = UDim2.new(0.45, 0, 1, 0)
+teleportBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+teleportBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+teleportBtn.TextSize = 14
+teleportBtn.Font = Enum.Font.GothamSemibold
+teleportBtn.Text = "TP BASE"
+local teleportCorner = Instance.new("UICorner", teleportBtn)
+teleportCorner.CornerRadius = UDim.new(0, 6)
+
+-- Noclip Button
+local noclipBtn = Instance.new("TextButton", buttonContainer)
+noclipBtn.Size = UDim2.new(0.45, 0, 1, 0)
+noclipBtn.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
+noclipBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+noclipBtn.TextSize = 14
+noclipBtn.Font = Enum.Font.GothamSemibold
+noclipBtn.Text = "NOCLIP OFF"
+local noclipCorner = Instance.new("UICorner", noclipBtn)
+noclipCorner.CornerRadius = UDim.new(0, 6)
+
+-- Status Label (small at bottom)
+local statusLabel = Instance.new("TextLabel", frame)
+statusLabel.Size = UDim2.new(1, -20, 0, 15)
+statusLabel.Position = UDim2.new(0, 10, 1, -20)
+statusLabel.BackgroundTransparency = 1
+statusLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
+statusLabel.TextSize = 12
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.Text = "Ready"
+statusLabel.TextXAlignment = Enum.TextXAlignment.Center
+
+-- Make draggable
+frame.Active = true
+frame.Draggable = true
+
+-- Teleport function
+teleportBtn.MouseButton1Click:Connect(function()
+    statusLabel.Text = "Searching..."
+    
+    local spawnPart
+    for _, plot in pairs(workspace.Plots:GetChildren()) do
+        if plot:FindFirstChild("PlotSign") and plot.PlotSign:FindFirstChild("SurfaceGui") then
+            local surfaceGui = plot.PlotSign.SurfaceGui
+            if surfaceGui:FindFirstChild("Frame") and surfaceGui.Frame:FindFirstChild("TextLabel") then
+                local textLabel = surfaceGui.Frame.TextLabel
+                if textLabel.Text == localPlayer.DisplayName.."'s Base" then
+                    spawnPart = surfaceGui.Parent.Parent:FindFirstChild("Spawn")
+                    break
+                end
+            end
+        end
+    end
+
+    if not spawnPart then
+        statusLabel.Text = "❌ No base!"
+        task.wait(1)
+        statusLabel.Text = "Ready"
+        return
+    end
+
+    statusLabel.Text = "Teleporting..."
+    
+    local char = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+    local target = spawnPart.CFrame + Vector3.new(0, 2, 0)
+
+    for i = 1, 20 do
+        hrp.CFrame = target
+        task.wait()
+    end
+
+    local humanoid = char:FindFirstChildOfClass("Humanoid")
+    humanoid.PlatformStand = true
+    humanoid.AutoRotate = false
+    
+    local start = tick()
+    while tick() - start < 1.5 do
+        hrp.CFrame = target * CFrame.Angles(
+            (math.random() - 0.5) * 0.1,
+            (math.random() - 0.5) * 0.1,
+            (math.random() - 0.5) * 0.1
+        )
+        task.wait(0.05)
+    end
+
+    humanoid.PlatformStand = false
+    humanoid.AutoRotate = true
+    statusLabel.Text = "✅ Done!"
+end)
+
+-- Noclip function
+noclipBtn.MouseButton1Click:Connect(function()
+    setNoclip(not noclipEnabled)
+    
+    if noclipEnabled then
+        noclipBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
+        noclipBtn.Text = "NOCLIP ON"
+        statusLabel.Text = "Noclip ON"
+    else
+        noclipBtn.BackgroundColor3 = Color3.fromRGB(120, 80, 200)
+        noclipBtn.Text = "NOCLIP OFF"
+        statusLabel.Text = "Noclip OFF"
+    end
+end)
+
+-- Cleanup
+gui.Destroying:Connect(function()
+    setNoclip(false)
+end)
+
+print("Instant Steal GUI Loaded")
